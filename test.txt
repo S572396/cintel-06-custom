@@ -47,3 +47,27 @@ def main():
     # Set the default selected year
     ui.selected_year(2025)
 
+
+
+#
+
+# Plotly Histogram
+with ui.navset_card_tab(id="tab"):
+    with ui.nav_panel("EV Histogram"):
+        @render_plotly
+        def plotly_histogram(Select_Year, select_attribute_list):
+            filtered_df = df[df['Make Year'] == Select_Year]
+            
+            # Create a title for the histogram
+            title = f"EV Data for Year {Select_Year}"
+            
+            # Generate histogram using Plotly
+            plotly_hist = px.histogram(
+                data_frame=filtered_df,
+                x=select_attribute_list[0],  # Using the first selected attribute
+                color="count",
+                title=title,
+                labels={'count': 'Count'}
+            )
+            
+            return plotly_hist
