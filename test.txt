@@ -46,9 +46,34 @@ with ui.h2("Plotly Scatterplot"):
         scatter = px.scatter(
             df,
             title="EV Data",
-            x=df["Model Year"],  # assuming you want to plot "Model Year" on the x-axis
+            x=df["Model Year"],
+            y=df['Total_Count_Per_Year'],
             color="Model Year"
         )
         return scatter
+
+# Projected EV Counts Line Chart
+with ui.h2("Projected EV Counts"):
+    @render_plotly
+    def projected_ev_counts():
+        last_year_data = df.groupby('Model Year').last().reset_index()
+        last_year_data['Growth_Rate'] = last_year_data['Total_Count_Per_Year'].pct_change().mean()
+        max_year = df['Model Year'].max()
+        future_years = list(range(max_year + 1, 2031))  # Future years from the max year in the data to 2030
+        projected_counts = [last_year_data['Total_Count_Per_Year'].iloc[-1] * ((1 + last_year_data['Growth_Rate']) ** (year - max_year)) for year in future_years]
+        
+        projected_df = pd.DataFrame({
+            'Model Year': future_years,
+            'Projected_Count': projected_counts
+        })
+        
+        line_chart = px.line(
+            projected_df,
+            title="Projected EV Counts",
+            x='Model Year',
+            y='Projected_Count'
+        )
+        
+        return line_chart
 
 
